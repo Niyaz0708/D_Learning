@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}D Learning{% endblock %}</title>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('d-learning-theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        })();
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #6b46c1;
+            --primary-light: rgba(107, 70, 193, 0.1);
+            --primary-dark: #553c9a;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0ea5e9;
+        }
+
+        html {
+            color-scheme: light;
+        }
+
+        /* Global Styles */
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            z-index: 1030;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        main.container {
+            flex: 1 0 auto;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+        }
+
+        .nav-link {
+            color: #4a5568 !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 500;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Form Styles */
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem var(--primary-light);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+
+        /* Badge Styles */
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        /* Link Styles */
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Custom Components */
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Footer */
+        .footer {
+            flex-shrink: 0;
+            background-color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+            border-top: 1px solid #eee;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+        }
+
+        /* Alert Styles */
+        .alert-primary {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] body {
+            color: #e7e5ef;
+            background-color: #15141b;
+        }
+
+        html[data-theme="dark"] .navbar,
+        html[data-theme="dark"] .footer,
+        html[data-theme="dark"] .card,
+        html[data-theme="dark"] .feature-card,
+        html[data-theme="dark"] .dropdown-menu {
+            color: #e7e5ef;
+            background-color: #211f29;
+            border-color: #393543;
+        }
+
+        html[data-theme="dark"] .navbar {
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .2);
+        }
+
+        html[data-theme="dark"] .nav-link,
+        html[data-theme="dark"] .dropdown-item {
+            color: #d2cedd !important;
+        }
+
+        html[data-theme="dark"] .nav-link:hover,
+        html[data-theme="dark"] .dropdown-item:hover {
+            color: #fff !important;
+            background-color: #302b3c;
+        }
+
+        html[data-theme="dark"] .navbar-toggler {
+            border-color: #514b5c;
+        }
+
+        html[data-theme="dark"] .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        html[data-theme="dark"] .bg-white {
+            background-color: #211f29 !important;
+        }
+
+        html[data-theme="dark"] .text-dark,
+        html[data-theme="dark"] .text-body {
+            color: #e7e5ef !important;
+        }
+
+        html[data-theme="dark"] .text-muted {
+            color: #aaa5b6 !important;
+        }
+
+        html[data-theme="dark"] .form-control,
+        html[data-theme="dark"] .form-select,
+        html[data-theme="dark"] .form-control:focus,
+        html[data-theme="dark"] .form-select:focus {
+            color: #f0edf7;
+            background-color: #26232e;
+            border-color: #514b5c;
+        }
+
+        html[data-theme="dark"] .form-control::placeholder {
+            color: #a8a2b4;
+        }
+
+        html[data-theme="dark"] .form-select option {
+            color: #f0edf7;
+            background-color: #26232e;
+        }
+
+        html[data-theme="dark"] .alert-light,
+        html[data-theme="dark"] .alert-secondary {
+            color: #e7e5ef;
+            background-color: #292632;
+            border-color: #403b4a;
+        }
+
+        html[data-theme="dark"] .table {
+            --bs-table-color: #e7e5ef;
+            --bs-table-bg: #211f29;
+            --bs-table-border-color: #393543;
+        }
+
+        html[data-theme="dark"] .test-generator .category-option,
+        html[data-theme="dark"] .test-generator .difficulty-option {
+            color: #e7e5ef;
+            background: #211f29;
+            border-color: #393543;
+        }
+
+        html[data-theme="dark"] .test-generator .test-settings {
+            color: #e7e5ef;
+            background: #211f29;
+        }
+
+        html[data-theme="dark"] .test-generator .category-description,
+        html[data-theme="dark"] .test-generator .page-title p,
+        html[data-theme="dark"] .test-generator .topic-example {
+            color: #aaa5b6;
+        }
+
+        html[data-theme="dark"] .footer {
+            border-top-color: #393543;
+        }
+
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            display: inline-grid;
+            place-items: center;
+            border-radius: 50%;
+        }
+
+        .theme-toggle i {
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 991.98px) {
+            .theme-toggle {
+                margin: .5rem 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'quiz:home' %}">
+                <i class="bi bi-mortarboard-fill me-2"></i>D Learning
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                           href="{% url 'quiz:home' %}">Home</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                           href="{% url 'quiz:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'generate_test' %}active{% endif %}" 
+                           href="{% url 'quiz:generate_test' %}">Generate Test</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" 
+                           href="{% url 'quiz:about' %}">About</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <button type="button" class="btn btn-outline-primary theme-toggle me-lg-2"
+                            id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode">
+                        <i class="bi bi-moon-stars-fill" aria-hidden="true"></i>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>{{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'quiz:dashboard' %}">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mb-4">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3">D Learning</h5>
+                    <p class="text-muted">Empowering learners through interactive quizzes and personalized learning paths.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">&copy; 2025 D Learning. All rights reserved.</p>
+                    <p class="mb-0 text-muted">Developed and managed by <span class="fw-semibold">MD Niyaz Alam</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('theme-toggle');
+            const icon = toggle.querySelector('i');
+
+            function updateThemeButton() {
+                const isDark = document.documentElement.dataset.theme === 'dark';
+                const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+                toggle.setAttribute('aria-label', label);
+                toggle.setAttribute('title', label);
+                icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+            }
+
+            updateThemeButton();
+            toggle.addEventListener('click', function() {
+                const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.dataset.theme = nextTheme;
+                localStorage.setItem('d-learning-theme', nextTheme);
+                updateThemeButton();
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

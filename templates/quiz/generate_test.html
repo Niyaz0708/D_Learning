@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Test - D Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    .test-generator {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title h1 {
+        color: var(--primary-color);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-title p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .topic-input {
+        margin-bottom: 2rem;
+    }
+
+    .topic-input label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .topic-input input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .topic-input input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: none;
+    }
+
+    .category-select {
+        min-height: 54px;
+        margin-bottom: .5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: .75rem;
+    }
+
+    .topic-example {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    .difficulty-options {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .difficulty-option {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .difficulty-option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .difficulty-option.selected {
+        border-color: var(--primary-color);
+        background: var(--primary-light);
+    }
+
+    .difficulty-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .difficulty-option.selected .difficulty-icon {
+        color: var(--primary-color);
+    }
+
+    .difficulty-name {
+        font-weight: 500;
+    }
+
+    .test-settings {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .settings-row {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .settings-group {
+        flex: 1;
+    }
+
+    .settings-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .range-input {
+        width: 100%;
+    }
+
+    .range-value {
+        text-align: center;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-top: 0.5rem;
+    }
+
+    .submit-section {
+        text-align: center;
+        margin-top: 3rem;
+    }
+
+    .btn-generate {
+        padding: 1rem 3rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .difficulty-options {
+            flex-direction: column;
+        }
+
+        .settings-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-generator">
+    <div class="page-title">
+        <h1>Create Your Custom Test</h1>
+        <p>Customize your learning experience by selecting your preferences below</p>
+    </div>
+
+    <form method="post" id="generateTestForm" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="difficulty" id="selectedDifficulty" required>
+
+        <!-- Category Selection -->
+        <h2 class="section-title">
+            <i class="bi bi-book-half me-2"></i>Select Subject
+        </h2>
+        <div class="mb-4">
+            <label class="visually-hidden" for="selectedCategory">Choose a subject</label>
+            <select class="form-select category-select" name="category" id="selectedCategory" required>
+                <option value="">Choose from {{ categories|length }} subjects</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback" id="categoryError">
+                Please select a subject
+            </div>
+        </div>
+
+        <!-- Topic Input -->
+        <h2 class="section-title">
+            <i class="bi bi-bookmark-star-fill me-2"></i>Specify Topic
+        </h2>
+        <div class="topic-input">
+            <input type="text" name="topic" id="topic" 
+                   placeholder="What specific topic would you like to test?" 
+                   required
+                   class="form-control">
+            <div class="invalid-feedback">
+                Please specify a topic
+            </div>
+            <p class="topic-example">Example: Data Structures, Algorithms, Web Development concepts, etc.</p>
+        </div>
+
+        <!-- Difficulty Selection -->
+        <h2 class="section-title">
+            <i class="bi bi-bar-chart-steps me-2"></i>Select Difficulty Level
+        </h2>
+        <div class="difficulty-options">
+            <div class="difficulty-option" data-difficulty="beginner">
+                <div class="difficulty-icon">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div class="difficulty-name">Beginner</div>
+            </div>
+
+            <div class="difficulty-option" data-difficulty="intermediate">
+                <div class="difficulty-icon">
+                    <i class="bi bi-star-half"></i>
+                </div>
+                <div class="difficulty-name">Intermediate</div>
+            </div>
+
+            <div class="difficulty-option" data-difficulty="advanced">
+                <div class="difficulty-icon">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="difficulty-name">Advanced</div>
+            </div>
+        </div>
+        <div class="invalid-feedback" id="difficultyError">
+            Please select a difficulty level
+        </div>
+
+        <!-- Test Settings -->
+        <h2 class="section-title">
+            <i class="bi bi-sliders me-2"></i>Test Settings
+        </h2>
+        <div class="test-settings">
+            <div class="settings-row">
+                <div class="settings-group">
+                    <label class="settings-label">Number of Questions</label>
+                    <input type="range" class="range-input" name="num_questions" 
+                           min="5" max="20" value="10" step="5" required>
+                    <div class="range-value">10 Questions</div>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Time Limit (minutes)</label>
+                    <input type="range" class="range-input" name="time_limit" 
+                           min="10" max="60" value="30" step="10" required>
+                    <div class="range-value">30 Minutes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-section">
+            <button type="submit" class="btn btn-primary btn-generate">
+                <i class="bi bi-lightning-charge-fill me-2"></i>Generate Test
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('generateTestForm');
+    const categoryInput = document.getElementById('selectedCategory');
+    const difficultyInput = document.getElementById('selectedDifficulty');
+
+    categoryInput.addEventListener('change', function() {
+        document.getElementById('categoryError').style.display = 'none';
+    });
+
+    // Difficulty Selection
+    const difficultyOptions = document.querySelectorAll('.difficulty-option');
+    difficultyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            difficultyOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            difficultyInput.value = this.dataset.difficulty;
+            document.getElementById('difficultyError').style.display = 'none';
+        });
+    });
+
+    // Range Input Updates
+    const rangeInputs = document.querySelectorAll('.range-input');
+    rangeInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const value = this.value;
+            const unit = this.name === 'num_questions' ? ' Questions' : ' Minutes';
+            this.nextElementSibling.textContent = value + unit;
+        });
+    });
+
+    // Form Validation
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+
+        // Validate category selection
+        if (!categoryInput.value) {
+            document.getElementById('categoryError').style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate difficulty selection
+        if (!difficultyInput.value) {
+            document.getElementById('difficultyError').style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate topic input
+        const topicInput = document.getElementById('topic');
+        if (!topicInput.value.trim()) {
+            topicInput.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            topicInput.classList.remove('is-invalid');
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+});
+</script>
+{% endblock %} 

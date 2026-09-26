@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic }} Revision Notes - D Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notes-page {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .notes-header {
+        margin-bottom: 1.5rem;
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        border-radius: 1.1rem;
+        color: #fff;
+        background: linear-gradient(130deg, #49308d, #7653ce);
+    }
+
+    .notes-header .badge {
+        color: #fff;
+        background: rgba(255, 255, 255, .17);
+    }
+
+    .notes-card {
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        border: 1px solid #ece8f4;
+        border-radius: 1.1rem;
+        background: #fff;
+        box-shadow: 0 12px 35px rgba(42, 31, 73, .06);
+    }
+
+    .notes-content {
+        color: #343044;
+        font-size: 1.02rem;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .notes-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+        margin-top: 1.5rem;
+    }
+    @media print {
+        nav, footer, .notes-actions, .navbar, .footer { display: none !important; }
+        main.container { max-width: none; margin: 0 !important; }
+        .notes-card { border: 0; box-shadow: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="notes-page">
+    <header class="notes-header">
+        <span class="badge rounded-pill mb-3"><i class="bi bi-journal-check me-1" aria-hidden="true"></i>{{ category.name }}</span>
+        <h1 class="h2 fw-bold mb-2">{{ topic }}: Quick Revision</h1>
+        <p class="mb-0 text-white-50">Your focused study notes are ready.</p>
+    </header>
+    <section class="notes-card" aria-label="Generated exam revision notes">
+        <div class="notes-content">{{ notes|linebreaksbr }}</div>
+        <div class="notes-actions">
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="bi bi-printer me-2" aria-hidden="true"></i>Print or Save as PDF
+            </button>
+            <a href="{% url 'quiz:home' %}#quick-revision" class="btn btn-primary">
+                <i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i>Revise Another Topic
+            </a>
+        </div>
+    </section>
+</article>
+{% endblock %}

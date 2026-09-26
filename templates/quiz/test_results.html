@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Results - D Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Test Summary Header -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body text-center">
+            <h1 class="display-4 mb-3">Test Results</h1>
+            <h2 class="h4 text-muted mb-4">{{ test.topic }}</h2>
+            
+            <!-- Score Display -->
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <h3 class="display-1 mb-0 {% if test.score >= 70 %}text-success{% elif test.score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                                {{ test.score|floatformat:1 }}%
+                            </h3>
+                            <p class="text-muted mb-0">Final Score</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle text-success display-4"></i>
+                            <h4 class="mt-2">{{ correct_answers }}</h4>
+                            <p class="text-muted mb-0">Correct Answers</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-x-circle text-danger display-4"></i>
+                            <h4 class="mt-2">{{ incorrect_answers }}</h4>
+                            <p class="text-muted mb-0">Incorrect Answers</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock display-4"></i>
+                            <h4 class="mt-2">{{ test.time_limit }} min</h4>
+                            <p class="text-muted mb-0">Time Limit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Results -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent">
+            <h3 class="h5 mb-0">Detailed Review</h3>
+        </div>
+        <div class="card-body">
+            {% for response in user_responses %}
+            <div class="question-review mb-4 p-3 rounded {% if response.is_correct %}bg-success-subtle{% else %}bg-danger-subtle{% endif %}">
+                <div class="d-flex align-items-center mb-2">
+                    {% if response.is_correct %}
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    {% else %}
+                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                    {% endif %}
+                    <h4 class="h6 mb-0">Question {{ forloop.counter }}</h4>
+                </div>
+                
+                <p class="mb-3">{{ response.question.text }}</p>
+                
+                <div class="options ms-4">
+                    {% for key, value in response.question.options.items %}
+                    <div class="option mb-2">
+                        <span class="{% if key == response.question.correct_answer %}text-success fw-bold{% elif key == response.answer %}text-danger{% endif %}">
+                            {{ key }}. {{ value }}
+                            {% if key == response.question.correct_answer %}
+                            <i class="bi bi-check-circle-fill text-success ms-2"></i>
+                            {% elif key == response.answer and not response.is_correct %}
+                            <i class="bi bi-x-circle-fill text-danger ms-2"></i>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if not response.is_correct %}
+                <div class="explanation mt-3">
+                    <h5 class="h6 text-muted">Explanation:</h5>
+                    <p class="mb-0 ms-3">{{ response.question.explanation }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        <a href="{% url 'quiz:generate_test' %}" class="btn btn-primary me-2">
+            <i class="bi bi-plus-circle me-2"></i>Take Another Test
+        </a>
+        <a href="{% url 'quiz:dashboard' %}" class="btn btn-outline-primary">
+            <i class="bi bi-graph-up me-2"></i>View Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    .question-review {
+        transition: transform 0.2s;
+    }
+    .question-review:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %} 

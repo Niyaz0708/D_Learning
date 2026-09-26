@@ -1,0 +1,544 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - D Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        isolation: isolate;
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 420px;
+        overflow: hidden;
+        margin-bottom: 3.5rem;
+        padding: 4rem clamp(1.5rem, 6vw, 5rem);
+        border-radius: 1.25rem;
+        color: #fff;
+        background: linear-gradient(125deg, #49308d, #7653ce);
+        box-shadow: 0 20px 50px rgba(66, 43, 127, .2);
+    }
+
+    .hero-image {
+        position: absolute;
+        z-index: -2;
+        inset: 0 0 0 auto;
+        width: 72%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 68% center;
+        opacity: .82;
+    }
+
+    .hero-section::after {
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        content: "";
+        background: linear-gradient(90deg, #49308d 0%, rgba(73, 48, 141, .97) 30%, rgba(73, 48, 141, .68) 55%, rgba(73, 48, 141, .12) 100%);
+    }
+
+    .hero-content {
+        max-width: 650px;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, .86);
+        font-size: .85rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .hero-title {
+        max-width: 600px;
+        margin-bottom: 1rem;
+        font-size: clamp(2.4rem, 5vw, 3.7rem);
+        font-weight: 750;
+        letter-spacing: -.04em;
+        line-height: 1.08;
+    }
+
+    .hero-subtitle {
+        max-width: 570px;
+        margin-bottom: 1.8rem;
+        color: rgba(255, 255, 255, .86);
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .8rem;
+    }
+
+    .hero-actions .btn {
+        padding: .8rem 1.2rem;
+        border-radius: .75rem;
+        font-weight: 600;
+    }
+
+    .hero-actions .btn-light {
+        color: var(--primary-dark);
+    }
+
+    .hero-actions .btn-outline-light:hover {
+        color: var(--primary-dark);
+    }
+
+    .stats-section {
+        margin: 3rem 0;
+        padding: 2rem 1rem;
+        border: 1px solid rgba(107, 70, 193, .08);
+        border-radius: 1rem;
+        background: linear-gradient(135deg, #f1edfb, #f8f6fd);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        margin-bottom: .3rem;
+        color: var(--primary-color);
+        font-size: 2.35rem;
+        font-weight: 750;
+    }
+
+    .stat-label {
+        color: #647084;
+        font-size: 1rem;
+    }
+
+    .revision-section {
+        margin: 0 0 4rem;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        border: 1px solid #ece8f6;
+        border-radius: 1.25rem;
+        background: #fff;
+        box-shadow: 0 14px 40px rgba(34, 25, 61, .06);
+        scroll-margin-top: 1.5rem;
+    }
+
+    .section-kicker {
+        color: var(--primary-color);
+        font-size: .82rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .revision-title {
+        margin: .45rem 0 .7rem;
+        color: #242039;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 700;
+    }
+
+    .revision-intro {
+        max-width: 670px;
+        margin-bottom: 1.8rem;
+        color: #697386;
+    }
+
+    .revision-form-card {
+        height: 100%;
+        padding: clamp(1.25rem, 3vw, 2rem);
+        border-radius: 1rem;
+        background: #faf9fd;
+    }
+
+    .revision-form-card .form-label {
+        color: #302b42;
+        font-weight: 600;
+    }
+
+    .revision-form-card .form-select,
+    .revision-form-card .form-control {
+        min-height: 50px;
+        border-color: #e4dfed;
+        border-radius: .7rem;
+    }
+
+    .revision-form-card .form-text {
+        color: #778093;
+    }
+
+    .revision-submit {
+        min-height: 50px;
+        border-radius: .7rem;
+        font-weight: 600;
+    }
+
+    .revision-aside {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        color: #fff;
+        background: linear-gradient(150deg, #6b46c1, #49308d);
+    }
+
+    .revision-aside-icon {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        margin-bottom: 1rem;
+        place-items: center;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .16);
+        font-size: 1.5rem;
+    }
+
+    .revision-aside p {
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, .82);
+    }
+
+    .category-section {
+        padding: 1rem 0;
+    }
+
+    .section-heading {
+        margin-bottom: .5rem;
+        color: #242039;
+        font-weight: 700;
+    }
+
+    .subject-picker-card {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: clamp(1.25rem, 3vw, 2rem);
+        border: 1px solid #ece8f4;
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(42, 31, 73, .06);
+    }
+
+    .subject-picker-card .form-select {
+        min-height: 52px;
+        border-color: #e4dfed;
+        border-radius: .7rem;
+    }
+
+    .subject-description {
+        min-height: 3rem;
+        margin: .8rem 0 1rem;
+        color: #697386;
+    }
+
+    html[data-theme="dark"] .subject-picker-card {
+        border-color: #393543;
+        background: #211f29;
+    }
+
+    html[data-theme="dark"] .subject-description {
+        color: #b9b4c4;
+    }
+
+    .features-section {
+        margin-top: 4rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.7rem;
+    }
+
+    .feature-icon {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        margin-right: 1rem;
+        place-items: center;
+        border-radius: 13px;
+        color: var(--primary-color);
+        background: var(--primary-light);
+        font-size: 1.2rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .hero-section {
+            min-height: 460px;
+            padding: 3rem 1.5rem;
+        }
+
+        .hero-image {
+            width: 100%;
+            opacity: .48;
+            object-position: 65% center;
+        }
+
+        .hero-section::after {
+            background: linear-gradient(90deg, rgba(73, 48, 141, .98), rgba(73, 48, 141, .66));
+        }
+
+        .stats-section {
+            padding: 1.5rem .5rem;
+        }
+
+        .stat-number {
+            font-size: 1.9rem;
+        }
+
+        .stat-label {
+            font-size: .85rem;
+        }
+    }
+
+    html[data-theme="dark"] .revision-section {
+        border-color: #393543;
+        background: #211f29;
+    }
+
+    html[data-theme="dark"] .revision-title,
+    html[data-theme="dark"] .section-heading {
+        color: #f0edf7;
+    }
+
+    html[data-theme="dark"] .revision-intro,
+    html[data-theme="dark"] .revision-section .form-text {
+        color: #b9b4c4;
+    }
+
+    html[data-theme="dark"] .revision-form-card {
+        background: #292632;
+    }
+
+    html[data-theme="dark"] .revision-form-card .form-label {
+        color: #eeeaf5;
+    }
+
+    html[data-theme="dark"] .stats-section {
+        border-color: #393543;
+        background: linear-gradient(135deg, #292632, #211f29);
+    }
+
+    html[data-theme="dark"] .stat-label {
+        color: #b9b4c4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section" aria-labelledby="hero-title">
+    <img class="hero-image" src="{% static 'images/hero-learning.png' %}" alt="" fetchpriority="high">
+    <div class="hero-content">
+        <div class="hero-eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> Learn · Practice · Grow</div>
+        <h1 class="hero-title" id="hero-title">Make every study session count.</h1>
+        <p class="hero-subtitle">Build confidence in computer science with quick exam revision and practice tailored to what you want to learn.</p>
+        <div class="hero-actions">
+            <a href="#quick-revision" class="btn btn-light btn-lg">
+                <i class="bi bi-journal-check me-2" aria-hidden="true"></i>Study Quick Revision
+            </a>
+            <a href="{% url 'quiz:generate_test' %}" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-play-circle me-2" aria-hidden="true"></i>Practice Session
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="revision-section" id="quick-revision" aria-labelledby="revision-title">
+    <div class="section-kicker">Your exam companion</div>
+    <h2 class="revision-title" id="revision-title">Short notes, right on time.</h2>
+    <p class="revision-intro">Choose a subject and topic to get a focused set of revision notes, key terms, and exam-ready reminders.</p>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="revision-form-card">
+                <form method="post" action="{% url 'quiz:quick_revision' %}">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="revision-subject" class="form-label">Choose a subject</label>
+                            <select class="form-select" id="revision-subject" name="category" required>
+                                <option value="">Select a subject</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="revision-topic" class="form-label">Choose a topic</label>
+                            <input class="form-control" id="revision-topic" name="topic" type="text"
+                                   list="revision-topic-suggestions" maxlength="200"
+                                   placeholder="e.g. Binary search trees" required>
+                            <datalist id="revision-topic-suggestions"></datalist>
+                            <div class="form-text">Pick a suggestion or enter your own topic.</div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary revision-submit px-4" type="submit">
+                                <i class="bi bi-magic me-2" aria-hidden="true"></i>Create My Revision Notes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <aside class="revision-aside">
+                <div class="revision-aside-icon"><i class="bi bi-lightbulb" aria-hidden="true"></i></div>
+                <h3 class="h5 fw-bold">Small notes. Big progress.</h3>
+                <p>Get a concise refresher with core ideas, useful examples, and a quick self-check for your chosen topic.</p>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section" aria-label="Learning platform highlights">
+    <div class="row g-3">
+        <div class="col-4">
+            <div class="stat-item">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Questions Available</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="stat-item">
+                <div class="stat-number">{{ categories|length }}</div>
+                <div class="stat-label">Core Categories</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Learning Access</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="category-section" aria-labelledby="categories-title">
+    <div class="text-center mb-4">
+        <div class="section-kicker">Explore your next topic</div>
+        <h2 class="section-heading" id="categories-title">Choose a subject to revise</h2>
+        <p class="revision-intro mx-auto mb-0">Browse all {{ categories|length }} computer science subjects from one simple list.</p>
+    </div>
+    <div class="subject-picker-card">
+        <label class="form-label fw-semibold" for="catalog-subject">Select a subject</label>
+        <select class="form-select" id="catalog-subject">
+            <option value="">Choose from {{ categories|length }} subjects</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" data-description="{{ category.description }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <p class="subject-description" id="catalog-subject-description" aria-live="polite">Choose a subject to see a short description.</p>
+        <a href="#quick-revision" class="btn btn-primary" id="catalog-revision-link">
+            <i class="bi bi-journal-check me-2" aria-hidden="true"></i>Revise this subject
+        </a>
+    </div>
+</section>
+
+<section class="features-section" aria-labelledby="features-title">
+    <h2 class="section-heading text-center mb-5" id="features-title">Why Choose D Learning?</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-lightning" aria-hidden="true"></i></div>
+                <div><h3 class="h5">Focused Revision</h3><p class="text-muted">Get concise, topic-based notes to make the most of your study time.</p></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-graph-up" aria-hidden="true"></i></div>
+                <div><h3 class="h5">Progress Tracking</h3><p class="text-muted">Monitor your improvement with detailed performance analytics.</p></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-clock" aria-hidden="true"></i></div>
+                <div><h3 class="h5">Learn at Your Pace</h3><p class="text-muted">Practice whenever you want, on the subjects you choose.</p></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-book" aria-hidden="true"></i></div>
+                <div><h3 class="h5">Computer Science Topics</h3><p class="text-muted">Explore programming, algorithms, databases, and more.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const subjectSelect = document.getElementById('revision-subject');
+    const topicInput = document.getElementById('revision-topic');
+    const suggestions = document.getElementById('revision-topic-suggestions');
+    const topicsBySubject = {
+        'Python Programming': ['Variables and data types', 'Functions', 'Object-oriented programming', 'Exception handling', 'Python collections'],
+        'Data Structures': ['Arrays and linked lists', 'Stacks and queues', 'Binary search trees', 'Hash tables', 'Graphs'],
+        'Algorithms': ['Sorting algorithms', 'Binary search', 'Recursion', 'Dynamic programming', 'Big O notation'],
+        'Web Development': ['HTML forms', 'CSS layout', 'JavaScript events', 'HTTP and REST APIs', 'Web accessibility'],
+        'Database Systems': ['SQL joins', 'Database normalization', 'Indexes', 'Transactions and ACID', 'Entity relationship models'],
+        'Operating Systems': ['Process scheduling', 'Virtual memory', 'Threads and synchronization', 'File systems', 'Deadlocks'],
+        'Computer Fundamentals': ['Computer components', 'Binary data representation', 'Input and output devices', 'Memory and storage'],
+        'C Programming': ['Pointers and memory', 'Arrays and strings', 'Functions', 'Structures and files'],
+        'C++ Programming': ['Classes and objects', 'Templates', 'STL containers', 'Memory management'],
+        'Java Programming': ['Collections framework', 'Interfaces and inheritance', 'Exception handling', 'Java streams'],
+        'Object-Oriented Programming': ['Encapsulation and abstraction', 'Inheritance', 'Polymorphism', 'Class relationships'],
+        'Computer Organization and Architecture': ['CPU instruction cycle', 'Cache memory', 'Instruction sets', 'Pipelining'],
+        'Digital Logic Design': ['Logic gates', 'Combinational circuits', 'Flip-flops and registers', 'Finite-state machines'],
+        'Computer Networks': ['OSI and TCP/IP models', 'IP addressing', 'Routing protocols', 'TCP and UDP'],
+        'Data Communication': ['Transmission media', 'Error detection', 'Data encoding', 'Communication protocols'],
+        'Software Engineering': ['Software development life cycle', 'Agile and Scrum', 'Requirements engineering', 'Software design patterns'],
+        'Software Testing and QA': ['Unit and integration testing', 'Test case design', 'Regression testing', 'Test automation'],
+        'Cybersecurity': ['Authentication and authorization', 'Encryption basics', 'Common web vulnerabilities', 'Security best practices'],
+        'Theory of Computation': ['Finite automata', 'Regular expressions', 'Context-free grammars', 'Turing machines'],
+        'Compiler Design': ['Lexical analysis', 'Parsing techniques', 'Symbol tables', 'Code optimization'],
+        'Artificial Intelligence': ['Search strategies', 'Knowledge representation', 'Expert systems', 'AI applications'],
+        'Machine Learning': ['Supervised learning', 'Classification and regression', 'Model evaluation', 'Overfitting and regularization'],
+        'Data Science': ['Data cleaning', 'Exploratory analysis', 'Data visualization', 'Feature engineering'],
+        'Cloud Computing': ['Cloud service models', 'Virtualization', 'Containers', 'Cloud deployment models'],
+        'Mobile App Development': ['Mobile app lifecycle', 'User interface layouts', 'App navigation', 'Local data storage'],
+        'Linux and Shell Programming': ['Essential Linux commands', 'File permissions', 'Shell variables', 'Bash scripting'],
+        'Internet of Things': ['Sensors and actuators', 'Embedded devices', 'IoT communication protocols', 'IoT security'],
+        'Human-Computer Interaction': ['Usability principles', 'User research', 'Accessibility', 'Interface prototyping']
+    };
+
+    function updateTopicSuggestions() {
+        const selectedSubject = subjectSelect.options[subjectSelect.selectedIndex].text;
+        suggestions.replaceChildren();
+        (topicsBySubject[selectedSubject] || []).forEach(function(topic) {
+            const option = document.createElement('option');
+            option.value = topic;
+            suggestions.appendChild(option);
+        });
+    }
+
+    subjectSelect.addEventListener('change', updateTopicSuggestions);
+    const catalogSelect = document.getElementById('catalog-subject');
+    const catalogDescription = document.getElementById('catalog-subject-description');
+    const catalogRevisionLink = document.getElementById('catalog-revision-link');
+
+    catalogSelect.addEventListener('change', function() {
+        const selectedOption = catalogSelect.options[catalogSelect.selectedIndex];
+        catalogDescription.textContent = selectedOption.dataset.description || 'Choose a subject to see a short description.';
+        catalogRevisionLink.classList.toggle('disabled', !catalogSelect.value);
+        catalogRevisionLink.setAttribute('aria-disabled', String(!catalogSelect.value));
+    });
+
+    catalogRevisionLink.addEventListener('click', function(event) {
+        if (!catalogSelect.value) {
+            event.preventDefault();
+            catalogSelect.focus();
+            return;
+        }
+        subjectSelect.value = catalogSelect.value;
+        updateTopicSuggestions();
+        topicInput.focus({ preventScroll: true });
+    });
+});
+</script>
+{% endblock %}

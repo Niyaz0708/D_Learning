@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Take Test - D Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+.test-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.test-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.timer {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4b5563;
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    border-radius: 6px;
+}
+
+.timer.warning {
+    color: #dc2626;
+    animation: pulse 1s infinite;
+}
+
+.question-container {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.option-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.option-label:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.option-label input[type="radio"] {
+    margin-right: 1rem;
+}
+
+.navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.nav-button {
+    padding: 0.75rem 1.5rem;
+    background: #4b5563;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-button:hover {
+    background: #374151;
+}
+
+.nav-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.option-letter {
+    font-weight: 600;
+    color: #4b5563;
+    margin-right: 1rem;
+    min-width: 24px;
+}
+
+.navigation-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.nav-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-dot:hover {
+    background: #9ca3af;
+}
+
+.nav-dot.current {
+    background: #3b82f6;
+}
+
+.nav-dot.answered {
+    background: #10b981;
+}
+
+.submit-button {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submit-button:hover {
+    background: #2563eb;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <div class="test-header">
+        <h1>{{ test.topic }}</h1>
+        <div class="timer">{{ test.time_limit }}:00</div>
+    </div>
+
+    <form id="test-form" method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+        <div class="question-container" id="question-{{ forloop.counter }}" {% if not forloop.first %}style="display: none;"{% endif %}>
+            <p class="question-text">{{ question.text }}</p>
+            <div class="options-container">
+                {% with options=question.options %}
+                <label class="option-label">
+                    <div class="option-content">
+                        <input type="radio" name="answer_{{ question.id }}" value="A">
+                        <span class="option-letter">A.</span>
+                        <span class="option-text">{{ options.A }}</span>
+                    </div>
+                </label>
+                <label class="option-label">
+                    <div class="option-content">
+                        <input type="radio" name="answer_{{ question.id }}" value="B">
+                        <span class="option-letter">B.</span>
+                        <span class="option-text">{{ options.B }}</span>
+                    </div>
+                </label>
+                <label class="option-label">
+                    <div class="option-content">
+                        <input type="radio" name="answer_{{ question.id }}" value="C">
+                        <span class="option-letter">C.</span>
+                        <span class="option-text">{{ options.C }}</span>
+                    </div>
+                </label>
+                <label class="option-label">
+                    <div class="option-content">
+                        <input type="radio" name="answer_{{ question.id }}" value="D">
+                        <span class="option-letter">D.</span>
+                        <span class="option-text">{{ options.D }}</span>
+                    </div>
+                </label>
+                {% endwith %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="navigation-controls">
+            <button type="button" class="nav-button" id="prevButton">Previous</button>
+            <div class="navigation-dots">
+                {% for question in questions %}
+                <div class="nav-dot {% if forloop.first %}current{% endif %}"></div>
+                {% endfor %}
+            </div>
+            <button type="button" class="nav-button" id="nextButton">Next</button>
+        </div>
+
+        <button type="submit" class="submit-button">Submit Test</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const questions = document.querySelectorAll('.question-container');
+    const navDots = document.querySelectorAll('.nav-dot');
+    const form = document.getElementById('test-form');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    let currentQuestionIndex = 0;
+    let timeLeft = {{ test.time_limit }} * 60;
+    let timer;
+
+    const startTimer = () => {
+        timer = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                form.submit();
+            }
+        }, 1000);
+    };
+
+    const updateTimerDisplay = () => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timerDisplay = document.querySelector('.timer');
+        
+        if (timerDisplay) {
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft <= 300) {
+                timerDisplay.classList.add('warning');
+            }
+        }
+    };
+
+    const showQuestion = (index) => {
+        currentQuestionIndex = index;
+        questions.forEach((q, i) => {
+            q.style.display = i === index ? 'block' : 'none';
+        });
+
+        navDots.forEach((dot, i) => {
+            dot.classList.toggle('current', i === index);
+        });
+
+        prevButton.disabled = index === 0;
+        nextButton.disabled = index === questions.length - 1;
+    };
+
+    // Add click event listeners for navigation buttons
+    nextButton.addEventListener('click', () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            showQuestion(currentQuestionIndex + 1);
+        }
+    });
+
+    prevButton.addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            showQuestion(currentQuestionIndex - 1);
+        }
+    });
+
+    const updateNavDot = (index) => {
+        const dot = navDots[index];
+        if (dot) {
+            dot.classList.add('answered');
+        }
+    };
+
+    navDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => showQuestion(index));
+    });
+
+    questions.forEach((question, index) => {
+        const radios = question.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => updateNavDot(index));
+        });
+    });
+
+    form.addEventListener('submit', () => {
+        clearInterval(timer);
+    });
+
+    // Initialize the first question and timer
+    showQuestion(0);
+    startTimer();
+});
+</script>
+{% endblock %}

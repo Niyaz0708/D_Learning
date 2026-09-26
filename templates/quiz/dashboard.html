@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - D Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #6b46c1;
+        --primary-light: rgba(107, 70, 193, 0.1);
+        --success-color: #059669;
+        --warning-color: #d97706;
+        --danger-color: #dc2626;
+        --info-color: #0ea5e9;
+    }
+
+    .stats-card {
+        border: none;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container {
+        position: relative;
+        margin: auto;
+        height: 300px;
+    }
+
+    .recent-test-card {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .recent-test-card:hover {
+        transform: translateX(5px);
+    }
+
+    .recent-test-card.passed {
+        border-left-color: var(--success-color);
+    }
+
+    .recent-test-card.failed {
+        border-left-color: var(--danger-color);
+    }
+
+    .category-progress {
+        height: 8px;
+        border-radius: 4px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #553c9a;
+        border-color: #553c9a;
+    }
+
+    .bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-6 mb-1">Learning Dashboard</h1>
+            <p class="text-muted mb-0">Track your progress and performance</p>
+        </div>
+        <a href="{% url 'quiz:generate_test' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>New Test
+        </a>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stats-card card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Overall Progress</h6>
+                            <h2 class="mb-0">{{ overall_progress|floatformat:1 }}%</h2>
+                        </div>
+                        <i class="bi bi-graph-up display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Tests Completed</h6>
+                            <h2 class="mb-0">{{ total_tests }}</h2>
+                        </div>
+                        <i class="bi bi-check-circle display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Categories Explored</h6>
+                            <h2 class="mb-0">{{ category_scores|length }}</h2>
+                        </div>
+                        <i class="bi bi-grid display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Avg. Score</h6>
+                            <h2 class="mb-0">{{ overall_progress|floatformat:1 }}%</h2>
+                        </div>
+                        <i class="bi bi-star display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4 mb-5">
+        <!-- Progress Over Time -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Progress Over Time</h5>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Category Performance -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Category Performance</h5>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tests and Categories -->
+    <div class="row g-4">
+        <!-- Recent Tests -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Recent Tests</h5>
+                    {% for test in recent_tests %}
+                    <div class="recent-test-card card mb-3 {% if test.score >= 70 %}passed{% else %}failed{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ test.topic }}</h6>
+                                    <p class="text-muted small mb-0">
+                                        {{ test.category.name }} • {{ test.difficulty|title }}
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <h5 class="mb-1 {% if test.score >= 70 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ test.score|floatformat:1 }}%
+                                    </h5>
+                                    <p class="text-muted small mb-0">
+                                        {{ test.date_created|date:"M d, Y" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No tests taken yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Category Progress -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Category Progress</h5>
+                    {% for category, score in category_scores.items %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-0">{{ category.name }}</h6>
+                                <p class="text-muted small mb-0">{{ category.description }}</p>
+                            </div>
+                            <span class="badge {% if score >= 70 %}bg-success{% elif score >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ score|floatformat:1 }}%
+                            </span>
+                        </div>
+                        <div class="progress category-progress">
+                            <div class="progress-bar {% if score >= 70 %}bg-success{% elif score >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar" style="width: {{ score }}%"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No category progress yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Progress Over Time Chart
+    const progressCtx = document.getElementById('progressChart').getContext('2d');
+    new Chart(progressCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for test in recent_tests reversed %}'{{ test.date_created|date:"M d" }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Test Scores',
+                data: [{% for test in recent_tests reversed %}{{ test.score|default:0 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                borderColor: '#6b46c1',
+                backgroundColor: 'rgba(107, 70, 193, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: value => value + '%'
+                    }
+                }
+            }
+        }
+    });
+
+    // Category Performance Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for category, score in category_scores.items %}'{{ category.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for category, score in category_scores.items %}{{ score|floatformat:1 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#6b46c1', // Primary purple
+                    '#059669', // Success green
+                    '#0ea5e9', // Info blue
+                    '#d97706', // Warning orange
+                    '#7c3aed', // Another purple shade
+                    '#4f46e5'  // Indigo
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 
